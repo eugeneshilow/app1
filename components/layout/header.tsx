@@ -11,30 +11,36 @@ const navigation = [
 ]
 
 export default function Header() {
-  const pathname = usePathname()
   const [isScrolled, setIsScrolled] = useState(false)
-  const isHomePage = pathname === "/"
-  
-  // Don't show header on auth pages
-  if (pathname.startsWith("/sign")) return null
+  const pathname = usePathname()
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > window.innerHeight - 100) {
+      if (window.scrollY > 0) {
         setIsScrolled(true)
       } else {
         setIsScrolled(false)
       }
     }
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    if (!pathname.startsWith("/auth")) {
+      window.addEventListener("scroll", handleScroll)
+      handleScroll()
+    }
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+    }
+  }, [pathname])
+
+  if (pathname.startsWith("/auth")) {
+    return null
+  }
 
   return (
     <header 
       className={`fixed top-0 z-50 w-full transition-all duration-300 ${
-        isHomePage 
+        pathname === "/" 
           ? isScrolled
             ? "border-b border-zinc-200 bg-white/80 backdrop-blur-md"
             : "bg-transparent"
@@ -47,7 +53,7 @@ export default function Header() {
           <Link 
             href="/" 
             className={`-m-1.5 p-1.5 text-lg font-semibold ${
-              isHomePage && !isScrolled ? "text-white" : "text-zinc-900"
+              pathname === "/" && !isScrolled ? "text-white" : "text-zinc-900"
             }`}
           >
             Claude
@@ -61,7 +67,7 @@ export default function Header() {
               key={item.name}
               href={item.href}
               className={`text-sm font-medium transition-colors ${
-                isHomePage && !isScrolled
+                pathname === "/" && !isScrolled
                   ? "text-white/90 hover:text-white"
                   : "text-zinc-900 hover:text-zinc-500"
               }`}
@@ -73,7 +79,7 @@ export default function Header() {
 
         {/* Right section */}
         <div className="flex flex-1 justify-end">
-          {(!isHomePage || isScrolled) && (
+          {(pathname !== "/" || isScrolled) && (
             <Link
               href="/sign-up"
               className="rounded-md bg-black px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800"
