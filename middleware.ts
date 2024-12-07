@@ -1,29 +1,29 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server"
-import type { NextRequest } from "next/server"
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
-const publicRoutes = createRouteMatcher([
-  "/",
-  "/login(.*)",
-  "/signup(.*)",
-  "/api/webhooks/clerk",
-  "/api/webhooks/stripe"
-])
+const isProtectedRoute = createRouteMatcher(["/chat(.*)"]);
 
-const proRoutes = createRouteMatcher([
-  "/((?!account|sign-in|sign-up|api).*)" // All routes except account, auth, and api
-])
-
-export default clerkMiddleware(async (auth, req: NextRequest) => {
-  if (!publicRoutes(req)) {
-    await auth.protect()
-    
-    // Check pro access
-    if (proRoutes(req)) {
-      await auth.protect(has => has({ role: "pro" }))
-    }
+export default clerkMiddleware(async (auth, req) => {
+  // Allow the root path to access sign-up component
+  if (req.nextUrl.pathname === "/") {
+    return NextResponse.next();
   }
-})
+
+  const { userId, redirectToSignIn } = await auth();
+
+  if (!userId && isProtectedRoute(req)) {
+    return redirectToSignIn({ returnBackUrl: "/login" });
+  }
+
+  if (userId && isProtectedRoute(req)) {
+    return NextResponse.next();
+  }
+});
 
 export const config = {
-  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"]
-}
+  matcher: [
+    "/((?!.+\\.[\\w]+$|_next|sign-in|sign-up).*)",
+    "/",
+    "/(api|trpc)(.*)"
+  ]
+};
