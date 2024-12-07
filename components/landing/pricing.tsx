@@ -2,8 +2,10 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 import { Check } from "lucide-react"
+import { useState } from "react"
 
 const tiers = [
   {
@@ -22,8 +24,10 @@ const tiers = [
   },
   {
     name: "Pro",
-    price: "$20",
+    monthlyPrice: "$12",
+    yearlyPrice: "$120",
     period: "per month",
+    yearlyPeriod: "per year",
     description: "For power users",
     features: [
       "Everything in Free, plus:",
@@ -54,6 +58,18 @@ const tiers = [
 ]
 
 export default function Pricing() {
+  const [isAnnual, setIsAnnual] = useState(true)
+
+  const handlePurchase = (tier: string) => {
+    if (tier !== "Pro") return
+
+    const link = isAnnual
+      ? process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_YEARLY
+      : process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_MONTHLY
+
+    if (link) window.location.href = link
+  }
+
   return (
     <div className="bg-zinc-50">
       <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
@@ -64,6 +80,37 @@ export default function Pricing() {
           <p className="mx-auto max-w-lg text-lg text-zinc-500">
             Choose the plan that's right for you
           </p>
+
+          <div className="mt-8 flex flex-col items-center justify-center">
+            <div className="rounded-full bg-zinc-100/80 p-1 backdrop-blur">
+              <div className="flex items-center gap-6 px-4 py-2">
+                <span 
+                  className={cn(
+                    "text-sm font-medium transition-colors",
+                    !isAnnual ? "text-zinc-900" : "text-zinc-500"
+                  )}
+                >
+                  Monthly
+                </span>
+                <Switch
+                  checked={isAnnual}
+                  onCheckedChange={setIsAnnual}
+                  className="data-[state=checked]:bg-black data-[state=unchecked]:bg-zinc-200"
+                />
+                <div className="flex flex-col items-start">
+                  <span
+                    className={cn(
+                      "text-sm font-medium transition-colors",
+                      isAnnual ? "text-zinc-900" : "text-zinc-500"
+                    )}
+                  >
+                    Annually
+                  </span>
+                  <span className="text-xs text-green-600">Save 17%</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="mx-auto mt-16 grid max-w-5xl gap-8 lg:grid-cols-3">
@@ -71,7 +118,7 @@ export default function Pricing() {
             <Card
               key={tier.name}
               className={cn(
-                "relative overflow-hidden border-zinc-200 bg-white transition-all hover:shadow-lg",
+                "relative flex flex-col overflow-hidden border-zinc-200 bg-white transition-all hover:shadow-lg",
                 tier.highlighted && "border-2 border-black shadow-lg"
               )}
             >
@@ -80,19 +127,23 @@ export default function Pricing() {
                   Popular
                 </div>
               )}
-              <CardContent className="p-6">
-                <div className="mb-8">
+              <CardContent className="flex flex-1 flex-col p-6">
+                <div>
                   <h3 className="text-lg font-semibold text-zinc-900">
                     {tier.name}
                   </h3>
                   <div className="mt-4">
                     <span className="text-4xl font-bold text-zinc-900">
-                      {tier.price}
+                      {tier.monthlyPrice
+                        ? isAnnual
+                          ? tier.yearlyPrice
+                          : tier.monthlyPrice
+                        : tier.price}
                     </span>
-                    {tier.period && (
+                    {(tier.period || tier.yearlyPeriod) && (
                       <span className="text-sm text-zinc-500">
                         {" "}
-                        {tier.period}
+                        {isAnnual ? tier.yearlyPeriod : tier.period}
                       </span>
                     )}
                   </div>
@@ -101,7 +152,7 @@ export default function Pricing() {
                   </p>
                 </div>
 
-                <div className="mb-8 space-y-3">
+                <div className="mt-6 flex-1 space-y-3">
                   {tier.features.map((feature) => (
                     <div key={feature} className="flex items-center gap-3">
                       <Check className="h-4 w-4 text-green-500" />
@@ -110,17 +161,20 @@ export default function Pricing() {
                   ))}
                 </div>
 
-                <Button
-                  className={cn(
-                    "w-full",
-                    tier.highlighted
-                      ? "bg-black text-white hover:bg-zinc-800"
-                      : "bg-white text-black hover:bg-zinc-50"
-                  )}
-                  variant={tier.highlighted ? "default" : "outline"}
-                >
-                  {tier.cta}
-                </Button>
+                <div className="mt-8">
+                  <Button
+                    onClick={() => handlePurchase(tier.name)}
+                    className={cn(
+                      "w-full",
+                      tier.highlighted
+                        ? "bg-black text-white hover:bg-zinc-800"
+                        : "bg-white text-black hover:bg-zinc-50"
+                    )}
+                    variant={tier.highlighted ? "default" : "outline"}
+                  >
+                    {tier.cta}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
