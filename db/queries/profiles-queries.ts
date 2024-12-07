@@ -45,6 +45,26 @@ export const updateProfileByUserId = async (
     }
 }
 
+export const updateProfileByStripeCustomerId = async (
+    stripeCustomerId: string,
+    data: Partial<InsertProfile>
+) => {
+    try {
+        const [updatedProfile] = await db
+            .update(profilesTable)
+            .set(data)
+            .where(eq(profilesTable.stripeCustomerId, stripeCustomerId))
+            .returning()
+        return updatedProfile
+    } catch (error) {
+        console.error("Error updating profile by stripe customer id", error)
+        throw new Error("Failed to update profile by stripe customer id")
+    }
+}
+
+// Just rename updateProfileByUserId to updateProfile for consistency
+export const updateProfile = updateProfileByUserId
+
 // 4. CRUD - Delete
 export const deleteProfileByUserId = async (userId: string) => {
     try {
