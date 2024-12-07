@@ -5,6 +5,27 @@ import Stripe from "stripe";
 
 const relevantEvents = new Set(["checkout.session.completed", "customer.subscription.updated", "customer.subscription.deleted"]);
 
+async function handleSubscriptionChange(event: Stripe.Event) {
+  const subscription = event.data.object as Stripe.Subscription;
+  const productId = subscription.items.data[0].price.product as string;
+  await manageSubscriptionStatusChange(subscription.id, subscription.customer as string, productId);
+}
+
+async function handleCheckoutSession(event: Stripe.Event) {
+  const checkoutSession = event.data.object as Stripe.Checkout.Session;
+  if (checkoutSession.mode === "subscription") {
+    const subscriptionId = checkoutSession.subscription as string;
+    await updateStripeCustomer(checkoutSession.client_reference_id as string, subscriptionId, checkoutSession.customer as string);
+
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+      expand: ["default_payment_method"]
+    });
+
+    const productId = subscription.items.data[0].price.product as string;
+    await manageSubscriptionStatusChange(subscription.id, subscription.customer as string, productId);
+  }
+}
+
 export async function POST(req: Request) {
   const body = await req.text();
   const sig = headers().get("Stripe-Signature") as string;
@@ -46,25 +67,4 @@ export async function POST(req: Request) {
   }
 
   return new Response(JSON.stringify({ received: true }));
-}
-
-async function handleSubscriptionChange(event: Stripe.Event) {
-  const subscription = event.data.object as Stripe.Subscription;
-  const productId = subscription.items.data[0].price.product as string;
-  await manageSubscriptionStatusChange(subscription.id, subscription.customer as string, productId);
-}
-
-async function handleCheckoutSession(event: Stripe.Event) {
-  const checkoutSession = event.data.object as Stripe.Checkout.Session;
-  if (checkoutSession.mode === "subscription") {
-    const subscriptionId = checkoutSession.subscription as string;
-    await updateStripeCustomer(checkoutSession.client_reference_id as string, subscriptionId, checkoutSession.customer as string);
-
-    const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
-      expand: ["default_payment_method"]
-    });
-
-    const productId = subscription.items.data[0].price.product as string;
-    await manageSubscriptionStatusChange(subscription.id, subscription.customer as string, productId);
-  }
 }
