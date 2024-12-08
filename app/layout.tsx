@@ -26,13 +26,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
-  const { userId } = await auth();
+  const { userId } = await auth()
 
   if (userId) {
-    const profile = await getProfileByUserId(userId);
+    const profile = await getProfileByUserId(userId)
     if (!profile) {
-      await createProfile({ userId });
+      await createProfile({ userId })
     }
   }
 
