@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/carousel"
 import { SignUp, useUser } from "@clerk/nextjs"
 import { ChevronDown } from "lucide-react"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 const carouselItems = [
   {
@@ -32,8 +32,17 @@ const carouselItems = [
 ]
 
 export default function Hero() {
+  const [mounted, setMounted] = useState(false)
   const { user } = useUser()
-  
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null
+  }
+
   const scrollToDescription = () => {
     document.getElementById('description')?.scrollIntoView({ 
       behavior: 'smooth',
