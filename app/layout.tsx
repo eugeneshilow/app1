@@ -1,3 +1,5 @@
+import Footer from "@/components/layout/footer";
+import Header from "@/components/layout/header";
 import { createProfile, getProfileByUserId } from "@/db/queries/profiles-queries";
 import { ClerkProvider } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
@@ -41,7 +43,9 @@ export default async function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          {children}
+          <Header />
+          <main className="flex min-h-screen flex-col">{children}</main>
+          <Footer />
         </body>
       </html>
     </ClerkProvider>
