@@ -81,7 +81,9 @@ export default function Pricing() {
     if (!user) {
       window.location.href = "/sign-up"
     } else {
-      window.location.href = link
+      const paymentUrl = new URL(link);
+      paymentUrl.searchParams.set('client_reference_id', user.id);
+      window.location.href = paymentUrl.toString();
     }
   }
 
