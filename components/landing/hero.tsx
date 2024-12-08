@@ -39,6 +39,15 @@ export default function Hero() {
     setMounted(true)
   }, [])
 
+  useEffect(() => {
+    if (mounted && user) {
+      document.getElementById('pricing')?.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      })
+    }
+  }, [mounted, user])
+
   if (!mounted) {
     return null
   }
@@ -125,13 +134,6 @@ export default function Hero() {
       </div>
     )
   }
-
-  useEffect(() => {
-    document.getElementById('pricing')?.scrollIntoView({ 
-      behavior: 'smooth',
-      block: 'start'
-    })
-  }, [])
 
   return null
 } 
