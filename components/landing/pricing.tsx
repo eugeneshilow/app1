@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
+import { useUser } from "@clerk/nextjs"
 import { Check } from "lucide-react"
 import { useState } from "react"
 
@@ -57,17 +58,31 @@ const tiers = [
   },
 ]
 
+// Add type safety for env variables
+const STRIPE_LINKS = {
+  monthly: process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_MONTHLY,
+  yearly: process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_YEARLY
+} as const
+
 export default function Pricing() {
   const [isAnnual, setIsAnnual] = useState(true)
+  const { user } = useUser()
 
   const handlePurchase = (tier: string) => {
     if (tier !== "Pro") return
 
-    const link = isAnnual
-      ? process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_YEARLY
-      : process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_MONTHLY
+    const link = isAnnual ? STRIPE_LINKS.yearly : STRIPE_LINKS.monthly
+    
+    if (!link) {
+      console.error("Stripe payment link not configured")
+      return
+    }
 
-    if (link) window.location.href = link
+    if (!user) {
+      window.location.href = "/sign-up"
+    } else {
+      window.location.href = link
+    }
   }
 
   return (
@@ -166,7 +181,7 @@ export default function Pricing() {
                     onClick={() => handlePurchase(tier.name)}
                     className={cn(
                       "w-full",
-                      tier.highlighted
+                      tier.highlighted 
                         ? "bg-black text-white hover:bg-zinc-800"
                         : "bg-white text-black hover:bg-zinc-50"
                     )}

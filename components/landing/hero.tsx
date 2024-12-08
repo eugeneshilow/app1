@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/carousel"
 import { SignUp, useUser } from "@clerk/nextjs"
 import { ChevronDown } from "lucide-react"
+import { useEffect } from "react"
 
 const carouselItems = [
   {
@@ -116,9 +117,12 @@ export default function Hero() {
     )
   }
 
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <h1>Welcome, {user.firstName || 'User'}!</h1>
-    </div>
-  )
+  useEffect(() => {
+    document.getElementById('pricing')?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    })
+  }, [])
+
+  return null
 } 
