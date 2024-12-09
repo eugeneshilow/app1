@@ -1,59 +1,90 @@
-import { PlusIcon, UserIcon } from 'lucide-react'
+"use client"
+
+import { Button } from "@/components/ui/button"
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Separator } from "@/components/ui/separator"
+import { PlusIcon, UserIcon } from "lucide-react"
 
 export default function ChatSidebar() {
   const chats = [
-    { id: '1', title: 'Привет как дела' },
-    { id: '2', title: 'Meaning of asdf' },
-    { id: '3', title: 'Relax Etymology Explained' },
-    { id: '4', title: 'Ansible vs Jenkins Сравнение' },
+    { id: "1", title: "Привет как дела" },
+    { id: "2", title: "Meaning of asdf" },
+    { id: "3", title: "Relax Etymology Explained" },
+    { id: "4", title: "Ansible vs Jenkins Сравнение" },
   ]
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
-      <div className="flex items-center justify-between p-4">
-        <div className="text-lg font-medium">Chats</div>
-        <button className="p-2 hover:bg-gray-100 rounded">
-          <PlusIcon className="h-5 w-5 text-gray-700" />
-        </button>
-      </div>
+    <div className="w-64 border-r border-border">
+      <Card className="h-full rounded-none border-none">
+        <CardHeader className="flex items-center justify-between px-4 py-4">
+          <div>
+            <CardTitle className="text-sm font-medium">
+              Chats
+            </CardTitle>
+            <CardDescription className="text-xs text-muted-foreground">
+              Manage your conversations
+            </CardDescription>
+          </div>
+          <Button variant="ghost" size="sm">
+            <PlusIcon className="h-4 w-4" />
+          </Button>
+        </CardHeader>
 
-      <div className="flex-1 overflow-y-auto">
-        <div className="px-4 py-2 text-sm text-gray-500 font-semibold">
-          Today
+        <Separator />
+
+        <ScrollArea className="flex-1">
+          <div className="px-4 py-2">
+            <div className="mb-2 text-xs font-semibold text-muted-foreground">
+              Today
+            </div>
+            <Button variant="ghost" className="w-full justify-start px-2 py-3 text-sm hover:bg-accent hover:text-accent-foreground">
+              Привет как дела
+            </Button>
+          </div>
+
+          <Separator />
+
+          <div className="px-4 py-2">
+            <div className="mb-2 text-xs font-semibold text-muted-foreground">
+              Previous 7 Days
+            </div>
+            {chats.slice(1, 3).map((chat) => (
+              <Button
+                key={chat.id}
+                variant="ghost"
+                className="w-full justify-start px-2 py-3 text-sm hover:bg-accent hover:text-accent-foreground"
+              >
+                {chat.title}
+              </Button>
+            ))}
+          </div>
+
+          <Separator />
+
+          <div className="px-4 py-2">
+            <div className="mb-2 text-xs font-semibold text-muted-foreground">
+              Previous 30 Days
+            </div>
+            {chats.slice(3).map((chat) => (
+              <Button
+                key={chat.id}
+                variant="ghost"
+                className="w-full justify-start px-2 py-3 text-sm hover:bg-accent hover:text-accent-foreground"
+              >
+                {chat.title}
+              </Button>
+            ))}
+          </div>
+        </ScrollArea>
+
+        <Separator />
+
+        <div className="flex items-center gap-2 p-4">
+          <UserIcon className="h-6 w-6 text-muted-foreground" />
+          <span className="text-sm text-foreground">My Account</span>
         </div>
-        <button className="w-full text-left px-4 py-3 hover:bg-gray-100 focus:bg-gray-200">
-          Привет как дела
-        </button>
-
-        <div className="px-4 py-2 text-sm text-gray-500 font-semibold">
-          Previous 7 Days
-        </div>
-        {chats.slice(1,3).map((chat) => (
-          <button
-            key={chat.id}
-            className="w-full text-left px-4 py-3 hover:bg-gray-100 focus:bg-gray-200"
-          >
-            {chat.title}
-          </button>
-        ))}
-
-        <div className="px-4 py-2 text-sm text-gray-500 font-semibold">
-          Previous 30 Days
-        </div>
-        {chats.slice(3).map((chat) => (
-          <button
-            key={chat.id}
-            className="w-full text-left px-4 py-3 hover:bg-gray-100 focus:bg-gray-200"
-          >
-            {chat.title}
-          </button>
-        ))}
-      </div>
-
-      <div className="p-4 border-t border-gray-200 flex items-center gap-2">
-        <UserIcon className="h-6 w-6 text-gray-600" />
-        <span className="text-sm text-gray-700">My Account</span>
-      </div>
-    </aside>
+      </Card>
+    </div>
   )
 }

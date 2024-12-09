@@ -1,6 +1,8 @@
 "use client"
 
 import { generateOpenAIResponseAction } from "@/actions/openai-actions"
+import { Card, CardContent } from "@/components/ui/card"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { SelectMessage } from "@/db/schema"
 import { cn } from "@/lib/utils"
 import { readStreamableValue } from "ai/rsc"
@@ -26,7 +28,6 @@ export default function ChatMain({
     const userMessageId = Date.now().toString()
     const assistantMessageId = `${Date.now() + 1}`
 
-    // Add user message
     setMessages(prev => [
       ...prev,
       {
@@ -78,29 +79,34 @@ export default function ChatMain({
   }
 
   return (
-    <div className={cn("flex h-full flex-col", className)}>
-      <div className="flex-1 space-y-4 overflow-y-auto p-4">
-        {messages.length === 0 ? (
-          <div className="flex h-full items-center justify-center">
-            <div className="flex flex-col items-center gap-2 text-muted-foreground">
-              <MessageSquare className="h-8 w-8" />
-              <p>No messages yet</p>
-            </div>
+    <div className={cn("flex h-full flex-col flex-1", className)}>
+      <Card className="rounded-none border-l border-border flex-1 flex flex-col bg-background">
+        <CardContent className="flex-1 flex flex-col p-0">
+          <ScrollArea className="flex-1 space-y-4 p-4">
+            {messages.length === 0 ? (
+              <div className="flex h-full items-center justify-center">
+                <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                  <MessageSquare className="h-8 w-8" />
+                  <p>No messages yet</p>
+                </div>
+              </div>
+            ) : (
+              messages.map(message => (
+                <ChatMessage key={message.id} message={message} />
+              ))
+            )}
+            {isGenerating && (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>AI is typing...</span>
+              </div>
+            )}
+          </ScrollArea>
+          <div className="border-t border-border bg-background">
+            <ChatInput onSend={handleSendMessage} disabled={isGenerating} />
           </div>
-        ) : (
-          messages.map(message => (
-            <ChatMessage key={message.id} message={message} />
-          ))
-        )}
-        {isGenerating && (
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span>AI is typing...</span>
-          </div>
-        )}
-      </div>
-
-      <ChatInput onSend={handleSendMessage} disabled={isGenerating} />
+        </CardContent>
+      </Card>
     </div>
   )
 }

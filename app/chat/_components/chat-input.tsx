@@ -28,7 +28,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   }
 
   return (
-    <div className="border-t bg-background p-4">
+    <div className="p-4 bg-background">
       <div className="mx-auto flex max-w-2xl items-end gap-4">
         <Textarea
           value={message}
@@ -43,6 +43,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           onClick={handleSend}
           disabled={disabled || !message.trim()}
           size="icon"
+          variant="default"
         >
           <SendHorizontal className="h-5 w-5" />
         </Button>

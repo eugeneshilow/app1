@@ -17,26 +17,23 @@ export function ChatMessage({ message }: ChatMessageProps) {
     <div
       className={cn(
         "flex items-start gap-4 rounded-lg p-4",
-        isUser ? "bg-muted/50" : "bg-background"
+        isUser
+          ? "bg-secondary/50 text-foreground"
+          : "bg-muted/50 text-foreground"
       )}
     >
       <div
         className={cn(
           "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-          isUser ? "bg-primary" : "bg-primary/10"
+          isUser ? "bg-primary text-primary-foreground" : "bg-accent text-accent-foreground"
         )}
       >
-        {isUser ? (
-          <User className="h-5 w-5 text-primary-foreground" />
-        ) : (
-          <Bot className="h-5 w-5 text-primary" />
-        )}
+        {isUser ? <User className="h-5 w-5" /> : <Bot className="h-5 w-5" />}
       </div>
 
-      <div className="flex-1">
+      <div className="flex-1 text-sm leading-relaxed">
         <Markdown content={message.content} />
       </div>
     </div>
   )
 }
-  
