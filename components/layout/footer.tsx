@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 const footerLinks = [
   {
@@ -33,6 +34,13 @@ const socialLinks = [
 ]
 
 export default function Footer() {
+  const pathname = usePathname()
+
+  // Hide footer on auth and chat routes
+  if (pathname.startsWith("/auth") || pathname.startsWith("/chat")) {
+    return null
+  }
+
   return (
     <footer className="border-t border-zinc-800 bg-black text-white">
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">

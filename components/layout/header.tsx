@@ -33,7 +33,7 @@ export default function Header() {
     }
   }, [pathname])
 
-  if (pathname.startsWith("/auth")) {
+  if (pathname.startsWith("/auth") || pathname.startsWith("/chat")) {
     return null
   }
 
