@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { useUser } from "@clerk/nextjs"
 import { motion } from "framer-motion"
 import { Check } from "lucide-react"
 import { useState } from "react"
@@ -71,6 +72,22 @@ const plans: Plan[] = [
 
 export default function Pricing() {
   const [isAnnual, setIsAnnual] = useState(false)
+  const { user } = useUser()
+
+  const handleProSubscription = () => {
+    const baseUrl = isAnnual 
+      ? process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_YEARLY 
+      : process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_MONTHLY
+
+    if (!baseUrl) {
+      console.error("Stripe payment link not configured")
+      return
+    }
+
+    // Append client_reference_id to the URL
+    const paymentUrl = `${baseUrl}?client_reference_id=${user?.id}`
+    window.location.href = paymentUrl
+  }
 
   return (
     <section className="relative overflow-hidden bg-zinc-50 py-24">
@@ -191,6 +208,7 @@ export default function Pricing() {
                       : "bg-white hover:bg-zinc-50"
                   }`}
                   variant={plan.popular ? "default" : "outline"}
+                  onClick={plan.name === "Pro" ? handleProSubscription : undefined}
                 >
                   {plan.cta}
                 </Button>
