@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 const isProtectedRoute = createRouteMatcher(["/chat(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   // Allow public routes
   if (req.nextUrl.pathname === "/") {
@@ -14,7 +14,9 @@ export default clerkMiddleware(async (auth, req) => {
   // Protect chat routes
   if (isProtectedRoute(req)) {
     if (!userId) {
-      return auth().redirectToSignIn({ returnBackUrl: req.url });
+      const signInUrl = new URL('/sign-in', req.url);
+      signInUrl.searchParams.set('returnBackUrl', req.url);
+      return NextResponse.redirect(signInUrl);
     }
     return NextResponse.next();
   }
