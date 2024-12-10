@@ -17,9 +17,9 @@ export default function MessageItem({ role, content }: MessageItemProps) {
           <User className="h-5 w-5 text-zinc-600" />
         )}
       </div>
-
+      
       <div className="flex-1">
-        <p className="text-sm text-zinc-600">{content}</p>
+        <p className="text-sm text-zinc-600 whitespace-pre-wrap">{content}</p>
       </div>
     </div>
   )
